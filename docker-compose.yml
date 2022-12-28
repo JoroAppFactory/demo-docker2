@@ -2,6 +2,8 @@ version: '3'
 
 networks:
     laravel:
+    app-two_app-shared:
+        external: true
 
 services:
     nginx:
@@ -17,6 +19,7 @@ services:
             - mysql
         networks:
             - laravel
+            - app-two_app-shared
 
     mysql:
         image: mysql:latest
@@ -48,6 +51,7 @@ services:
             - "9002:9000"
         networks:
             - laravel
+            - app-two_app-shared
 
     phpmyadmin:
         image: phpmyadmin
