@@ -1,0 +1,97 @@
+version: '3'
+
+networks:
+    laravel:
+
+services:
+    nginx:
+        image: nginx:stable-alpine
+        container_name: nginx
+        ports:
+            - "8090:80"
+        volumes:
+            - ./demo:/var/www/demo
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - app
+            - mysql
+        networks:
+            - laravel
+
+    mysql:
+        image: mysql:latest
+        container_name: mysql_two
+        restart: unless-stopped
+        tty: true
+        volumes:
+            - ./mysql:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: homestead
+            MYSQL_USER: homestead
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: secret
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        ports:
+            - "4308:3306"
+        networks:
+            - laravel
+
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: app
+        volumes:
+            - ./demo:/var/www/demo
+        ports:
+            - "9002:9000"
+        networks:
+            - laravel
+
+    phpmyadmin:
+        image: phpmyadmin
+        restart: always
+        container_name: phpmyadmin
+        depends_on:
+            -   mysql
+        ports:
+            - "8087:80"
+        environment:
+            PMA_HOST: mysql
+            MYSQL_ROOT_PASSWORD: secret
+        networks:
+            - laravel
+
+    composer:
+        image: composer:latest
+        container_name: composer_two
+        volumes:
+            - ./demo:/var/www/demo
+        working_dir: /var/www/demo
+        networks:
+            - laravel
+
+    npm:
+        image: node
+        container_name: node_two
+        volumes:
+            - ./demo:/var/www/demo
+        working_dir: /var/www/demo
+        networks:
+            - laravel
+        entrypoint: ["npm"]
+
+    artisan:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: artisan
+        volumes:
+            - ./demo:/var/www/demo
+        depends_on:
+            - mysql
+        working_dir: /var/www/demo
+        entrypoint: ['/var/www/demo/artisan']
+        networks:
+            - laravel
