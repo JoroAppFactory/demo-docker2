@@ -20,7 +20,7 @@ services:
 
     mysql:
         image: mysql:latest
-        container_name: mysql_two
+        container_name: mysql
         restart: unless-stopped
         tty: true
         volumes:
@@ -65,7 +65,7 @@ services:
 
     composer:
         image: composer:latest
-        container_name: composer_two
+        container_name: composer
         volumes:
             - ./demo:/var/www/demo
         working_dir: /var/www/demo
@@ -74,7 +74,7 @@ services:
 
     npm:
         image: node
-        container_name: node_two
+        container_name: node
         volumes:
             - ./demo:/var/www/demo
         working_dir: /var/www/demo
